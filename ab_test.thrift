@@ -1,34 +1,70 @@
 namespace java com.vswamy.ab_testing
 
-struct ExperimentState
+exception NullOrEmptyException 
 {
-	1: string name,
-	2: i32 weightage,
-	3: i32 cumulativeWeightage
-}
-
-struct ExperimentStateResponse 
-{
-   1: ExperimentState state,
-   2: bool debugInfo = 0,
-   3: list<ExperimentState> allStates,
-   4: optional string comment,
-   5: string experimentName
-}
-
-struct ExperimentStateRequest 
-{
-    1:string experimentName, 
-    2:bool debugInfo = 0,
+   1: string message
 }
 
 exception ExperimentNotFoundException 
 {
-   1: string info
+   1: string message
+}
+
+exception ExperimentAlreadyExistsException 
+{
+   1: string message
+}
+
+exception InvalidPasscodeException 
+{
+   1: string message
+}
+
+struct Experiment
+{
+	1: string experimentName,
+	2: map<string, i32> stateWeights,
+	3: string authorName,
+	4: string authorEmailAddress,
+	5: string passcode
 }
 
 service ExperimentService
 {
     bool ping(),
-    ExperimentStateResponse getExperimentState(1: ExperimentStateRequest request)
-} 
+    
+    string getExperimentState(1: string experimentName) throws (
+    		1: ExperimentNotFoundException experimentNotFoundException, 
+    		2: NullOrEmptyException nullOrEmptyException
+    		),
+    
+    // Does not throw exception if certain experiments are not found instead, returns as much as possible.
+    map<string,string> getExperimentsState(1: list<string> experimentsName) throws (
+    		1: NullOrEmptyException nullOrEmptyException
+    		), 
+    
+    //passcode will always be either NULL or empty string
+    Experiment getExperiment(1: string experimentName) throws (
+    		1: ExperimentNotFoundException experimentNotFoundException, 
+    		2: NullOrEmptyException nullOrEmptyException
+    		), 
+    
+    bool createExperiment(1: Experiment experiment) throws (
+    		1: ExperimentAlreadyExistsException experimentAlreadyExistsException, 
+    		2: NullOrEmptyException nullOrEmptyException
+    		),
+    
+    bool editExperiment(1: Experiment experiment) throws (
+    		1: InvalidPasscodeException invalidPasscodeException, 
+    		2: NullOrEmptyException nullOrEmptyException,
+    		3: ExperimentNotFoundException experimentNotFoundException
+    		)
+
+}
+
+
+
+
+
+
+
