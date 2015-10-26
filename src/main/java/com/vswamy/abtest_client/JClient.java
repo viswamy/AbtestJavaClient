@@ -1,5 +1,6 @@
 package com.vswamy.abtest_client;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vswamy.ab_testing.Experiment;
+import com.vswamy.ab_testing.ExperimentAlreadyExistsException;
 import com.vswamy.ab_testing.ExperimentNotFoundException;
 import com.vswamy.ab_testing.ExperimentService;
 import com.vswamy.ab_testing.NullOrEmptyException;
@@ -142,8 +144,61 @@ public class JClient
 
         // jclient.getExperimentsStateTest();
 
-        jclient.getExperimentTest();
+        //jclient.getExperimentTest();
+        
+        //jclient.createExperimentTest();
+        
+        jclient.editExperimentTest();
+        
         return;
+    }
+
+    private void editExperimentTest() throws ExperimentAlreadyExistsException, NullOrEmptyException, TException
+    {
+        logger.info("Starting editExperiment() test!...");
+        
+        
+        Experiment experiment = new Experiment();
+        experiment.setExperimentName("4");
+        experiment.setAuthorName("vswamy_client_edit");
+        experiment.setAuthorEmailAddress("vswamy_client_edit@outlook.com");
+        experiment.setPasscode("mypasscode");
+        
+        HashMap<String, Integer> m = new HashMap<String, Integer>();
+        m.put("C",60);
+        m.put("T", 40);
+        experiment.setStateWeights(m);
+        
+        long start = System.nanoTime();
+        boolean flag = client.editExperiment(experiment);
+        long end = System.nanoTime();
+        logger.info("Return of createExperiment => {}", flag);
+        logger.info("Time taken in milliseconds for 10000 requests => {}", (end - start) / 1000000.0);
+
+    }
+    
+    private void createExperimentTest() throws ExperimentAlreadyExistsException, NullOrEmptyException, TException
+    {
+    	logger.info("Starting getExperiment() test!...");
+        
+        
+        Experiment experiment = new Experiment();
+        experiment.setExperimentName("4");
+        experiment.setAuthorName("vswamy_client");
+        experiment.setAuthorEmailAddress("vswamy_client@outlook.com");
+        experiment.setPasscode("mypasscode");
+        
+        HashMap<String, Integer> m = new HashMap<String, Integer>();
+        m.put("C",60);
+        m.put("T", 40);
+        experiment.setStateWeights(m);
+        
+        long start = System.nanoTime();
+        boolean flag = client.createExperiment(experiment);
+        long end = System.nanoTime();
+        logger.info("Return of createExperiment => {}", flag);
+        logger.info("Time taken in milliseconds for 10000 requests => {}", (end - start) / 1000000.0);
+
     }
 
     private void getExperimentTest() throws ExperimentNotFoundException, NullOrEmptyException, TException
